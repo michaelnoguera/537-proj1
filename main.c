@@ -12,6 +12,17 @@
 #include <getopt.h>
 #include <string.h>
 
+void flipOption(char *optarg, int *opt) {
+    if (optarg != 0) 
+    {
+        if (strcmp(optarg,"-") == 0) {
+            *opt = 0;
+        }
+    } else {
+        *opt = 1;
+    }
+}   
+
 int main(int argc, char *argv[]) {
     int pid;
     int opt;
@@ -22,6 +33,7 @@ int main(int argc, char *argv[]) {
         int systemTime;
         int virtMemory;
         int command;
+        int procMem;
     };
 
     struct Flags psFlags = {
@@ -30,39 +42,35 @@ int main(int argc, char *argv[]) {
         .systemTime = 0,
         .virtMemory = 0,
         .command = 1,
+        .procMem = 0,
     };
-
-    while ((opt = getopt(argc, argv, "p:s:S:v:c:")) != -1) {
+    while ((opt = getopt(argc, argv, "p:s::S::v::c::")) != -1) {
         switch ((char) opt) {
             case 'p':
                 printf("%s", "p was passed");
                 break;
             case 's':
-                if (strcmp(optarg, "-")) {
-                    psFlags.singleChar = 0;
-                }
+                flipOption(optarg, &psFlags.singleChar);
                 break;
             case 'U':
-                if (strcmp(optarg, "-")) {
-                    psFlags.userTime = 0;
-                }
+                flipOption(optarg, &psFlags.userTime);
                 break;
             case 'S':
-                if (strcmp(optarg, "-")) {
-                    psFlags.systemTime = 0;
-                }
+                flipOption(optarg, &psFlags.systemTime);
                 break;
             case 'v':
-                if (strcmp(optarg, "-")) {
-                    psFlags.virtMemory = 0;
-                }
+                flipOption(optarg, &psFlags.virtMemory);
                 break;
             case 'c':
-                if (strcmp(optarg, "-")) {
-                    psFlags.command = 0;
-                }
+                flipOption(optarg, &psFlags.command);
                 break;
-            case ':': // an argument that accepts an option was called without an option provided
+            case 'm':
+                // 'm' option has arguments itself, parsing for these options will need to be added.
+                psFlags.procMem = 1;
+                break;
+            // TODO: Remove. 
+            // Left here if necessary for some reason, for now it doesn't look like it's needed.
+            /*case ':': // an argument that accepts an option was called without an option provided
                 switch (opt) {
                     case 's': psFlags.singleChar = 1; break;
                     case 'U': psFlags.userTime = 1; break;
@@ -70,9 +78,9 @@ int main(int argc, char *argv[]) {
                     case 'v': psFlags.virtMemory = 1; break;
                     case 'c': psFlags.command = 1; break;
                     case 'p': printf("error: list of process IDs must follow -p\n"); break;
-                }
+                }*/
             default:
-                printf("Usage: %s [-t nsecs] [-n] name\n", argv[0]);
+                printf("Usage: 537ps [-p <pid>] [-s] [-U] [-S] [-v] [-c] [-m <addr> <len>]\n");
                 exit(EXIT_FAILURE);
         }
     }
