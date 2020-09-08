@@ -3,7 +3,7 @@
 
 #include <dirent.h> //contains readdir
 
-const char* getState(int pid);
+const char getState(int pid);
 // state is the third argument, with scanf specifier %c
 
 const int getUserTime(int pid);
