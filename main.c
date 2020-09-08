@@ -24,8 +24,10 @@ void flipOption(char *optarg, int *opt) {
 }   
 
 int main(int argc, char *argv[]) {
-    int pid;
+    int pid = 0;
     int opt;
+    int mem_addr = 0;
+    int mem_len = 0;
 
     struct Flags {
         int singleChar;
@@ -44,10 +46,14 @@ int main(int argc, char *argv[]) {
         .command = 1,
         .procMem = 0,
     };
-    while ((opt = getopt(argc, argv, "p:s::S::v::c::")) != -1) {
+    while ((opt = getopt(argc, argv, "p:s::S::v::c::m:")) != -1) {
         switch ((char) opt) {
             case 'p':
-                printf("%s", "p was passed");
+                pid = atoi(optarg);
+                if (pid == 0) {
+                    printf("Enter a valid (nonzero) process ID (pid) after -p.\n");
+                    exit(EXIT_FAILURE);
+                }
                 break;
             case 's':
                 flipOption(optarg, &psFlags.singleChar);
@@ -67,6 +73,16 @@ int main(int argc, char *argv[]) {
             case 'm':
                 // 'm' option has arguments itself, parsing for these options will need to be added.
                 psFlags.procMem = 1;
+                if (optind < argc) {
+                    // Add error handling case? The assignment doesn't specify if it's okay for the program to *also* accept hex addresses without '0x'.
+                    mem_addr = (int)strtol(argv[optind-1], NULL, 16);
+                    mem_len = atoi(argv[optind]);
+                }
+                if (mem_addr == 0 || mem_len == 0) {
+                    printf("Enter a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
+                    exit(EXIT_FAILURE);
+                }
+                printf("addr: %d, len: %d\n", mem_addr, mem_len);
                 break;
             // TODO: Remove. 
             // Left here if necessary for some reason, for now it doesn't look like it's needed.
@@ -85,4 +101,6 @@ int main(int argc, char *argv[]) {
         }
     }
     printf("s: %d\nU: %d\nS: %d\nv: %d\nc: %d\n", psFlags.singleChar,psFlags.userTime,psFlags.systemTime,psFlags.virtMemory,psFlags.command);
+
+    // Call print funcs
 }

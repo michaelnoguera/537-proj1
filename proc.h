@@ -9,3 +9,5 @@ const char* getState(int pid);
 const int getUserTime(int pid);
 
 const int getSystemTime(int pid);
+
+const int getVirtMemory(int pid);
