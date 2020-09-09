@@ -12,31 +12,25 @@
 #include <getopt.h>
 #include <string.h>
 
-void flipOption(char *optarg, int *opt) {
-    if (optarg != 0) 
-    {
-        if (strcmp(optarg,"-") == 0) {
-            *opt = 0;
-        }
-    } else {
-        *opt = 1;
-    }
-}   
+#include "util.h"
+
+struct Flags {
+    int singleChar;
+    int userTime;
+    int systemTime;
+    int virtMemory;
+    int command;
+    int procMem;
+};   
 
 int main(int argc, char *argv[]) {
-    int pid = 0;
+    pidslist_t* pids = (pidslist_t*) malloc(sizeof(pidslist_t));
+    pids->pid = -1;
+    int all_pids = 1;
+    int pid;
     int opt;
     int mem_addr = 0;
     int mem_len = 0;
-
-    struct Flags {
-        int singleChar;
-        int userTime;
-        int systemTime;
-        int virtMemory;
-        int command;
-        int procMem;
-    };
 
     struct Flags psFlags = {
         .singleChar = 0,
@@ -46,13 +40,17 @@ int main(int argc, char *argv[]) {
         .command = 1,
         .procMem = 0,
     };
+
     while ((opt = getopt(argc, argv, "p:s::S::v::c::m:")) != -1) {
         switch ((char) opt) {
             case 'p':
+                all_pids = 0;
                 pid = atoi(optarg);
                 if (pid == 0) {
                     printf("Enter a valid (nonzero) process ID (pid) after -p.\n");
                     exit(EXIT_FAILURE);
+                } else {
+                    push(&pids,pid);
                 }
                 break;
             case 's':
@@ -103,4 +101,7 @@ int main(int argc, char *argv[]) {
     printf("s: %d\nU: %d\nS: %d\nv: %d\nc: %d\n", psFlags.singleChar,psFlags.userTime,psFlags.systemTime,psFlags.virtMemory,psFlags.command);
 
     // Call print funcs
+    printf("List of PIDs:\n");
+    traverse(pids);
+    
 }
