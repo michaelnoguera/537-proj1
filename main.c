@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "util.h"
+#include "linkedlist.h"
 
 struct Flags {
     int singleChar;
@@ -24,8 +25,8 @@ struct Flags {
 };   
 
 int main(int argc, char *argv[]) {
-    pidslist_t* pids = (pidslist_t*) malloc(sizeof(pidslist_t));
-    pids->pid = -1;
+    linkedlist* pids = ll_initialize();
+    ll_push(pids, -1);
     int all_pids = 1;
     int pid;
     int opt;
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
                     printf("Enter a valid (nonzero) process ID (pid) after -p.\n");
                     exit(EXIT_FAILURE);
                 } else {
-                    push(&pids,pid);
+                    ll_push(pids,pid);
                 }
                 break;
             case 's':
@@ -82,17 +83,6 @@ int main(int argc, char *argv[]) {
                 }
                 printf("addr: %d, len: %d\n", mem_addr, mem_len);
                 break;
-            // TODO: Remove. 
-            // Left here if necessary for some reason, for now it doesn't look like it's needed.
-            /*case ':': // an argument that accepts an option was called without an option provided
-                switch (opt) {
-                    case 's': psFlags.singleChar = 1; break;
-                    case 'U': psFlags.userTime = 1; break;
-                    case 'S': psFlags.systemTime = 1; break;
-                    case 'v': psFlags.virtMemory = 1; break;
-                    case 'c': psFlags.command = 1; break;
-                    case 'p': printf("error: list of process IDs must follow -p\n"); break;
-                }*/
             default:
                 printf("Usage: 537ps [-p <pid>] [-s] [-U] [-S] [-v] [-c] [-m <addr> <len>]\n");
                 exit(EXIT_FAILURE);
@@ -102,6 +92,7 @@ int main(int argc, char *argv[]) {
 
     // Call print funcs
     printf("List of PIDs:\n");
-    traverse(pids);
-    
+    ll_print(pids);
+
+    ll_free(pids);
 }

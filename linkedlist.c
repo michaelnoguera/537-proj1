@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 // initializes empty list
-// remember to call freelist() when done!
+// remember to call ll_free when done!
 linkedlist* ll_initialize() {
     linkedlist* list = (linkedlist*)malloc(sizeof(linkedlist));
     if (list == NULL) {
@@ -43,9 +43,9 @@ void ll_push(linkedlist* list, int value) {
 }
 
 // gets value of node at index
-// DANGER: returns NULL if no such node exists
+// returns -1 if no such node exists
 int ll_get(linkedlist* list, int index) {
-    if (list->size <= index) return NULL;
+    if (list->size <= index) return -1;
 
     node* curr = list->head;
     for (int i = 0; i < index; i++) {

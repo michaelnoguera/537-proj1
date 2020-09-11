@@ -4,6 +4,8 @@
 
 #include "util.h"
 
+// toggles a command line option to the opposite of it's current value if
+// specified with a trailing dash
 void flipOption(char *optarg, int *opt) {
     if (optarg != 0) 
     {
@@ -15,19 +17,3 @@ void flipOption(char *optarg, int *opt) {
     }
 }
 
-void push(pidslist_t** pl, int pid) {
-    pidslist_t* newPidNode;
-    newPidNode = (pidslist_t*) malloc(sizeof(pidslist_t));
-
-    newPidNode->pid = pid;
-    newPidNode->next = *pl;
-    *pl = newPidNode;
-}
-
-void traverse(pidslist_t* pl) {
-    pidslist_t* pidTemp = pl;
-    while (pidTemp != NULL) {
-        printf("%d\n", pidTemp->pid);
-        pidTemp = pidTemp->next;
-    }   
-}
