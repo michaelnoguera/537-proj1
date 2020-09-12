@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
         .procMem = 0,
     };
 
-    while ((opt = getopt(argc, argv, "p:s::S::v::c::m:")) != -1) {
+    while ((opt = getopt(argc, argv, "p:s::U::S::v::c::m:")) != -1) {
         switch ((char) opt) {
             case 'p':
                 all_pids = 0;

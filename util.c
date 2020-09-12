@@ -11,6 +11,10 @@ void flipOption(char *optarg, int *opt) {
     {
         if (strcmp(optarg,"-") == 0) {
             *opt = 0;
+        } else {
+            printf("Cannot group options.\n");
+            printf("Usage: 537ps [-p <pid>] [-s] [-U] [-S] [-v] [-c] [-m <addr> <len>]\n");
+            exit(EXIT_FAILURE);
         }
     } else {
         *opt = 1;
