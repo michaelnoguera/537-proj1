@@ -47,11 +47,10 @@ const char getState(int pid) {
     // parse beginning of statfile
     int foundPid;
     char state;
-    fscanf(statfile, "%d (%*s) %c", &foundPid, &state); // ignore executable name using astrisk, see https://stackoverflow.com/q/1410132/11639533
-    
+    fscanf(statfile, "%d (%*s)) %c", &foundPid, &state); // ignore executable name using astrisk, see https://stackoverflow.com/q/1410132/11639533
     // cleanup and validity check
     fclose(statfile);
-    assert(pid == foundPid /* pid from stat file must match provided process pid */);
+    assert(pid == foundPid);  /* pid from stat file must match provided process pid */
 
     return state;
 }

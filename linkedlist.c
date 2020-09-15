@@ -22,8 +22,8 @@ linkedlist* ll_initialize() {
 void ll_push(linkedlist* list, int value) {
     // construct node to add
     node* new = (node*)malloc(sizeof(node));
-    if (new == NULL// adds new node with value at end
-) {
+    if (new == NULL) // adds new node with value at end
+    {
         perror("Error allocating memory for new node.\n");
         exit(EXIT_FAILURE);
     }

@@ -14,6 +14,7 @@
 
 #include "util.h"
 #include "linkedlist.h"
+#include "proc.h"
 
 struct Flags {
     int singleChar;
@@ -26,7 +27,6 @@ struct Flags {
 
 int main(int argc, char *argv[]) {
     linkedlist* pids = ll_initialize();
-    ll_push(pids, -1);
     int all_pids = 1;
     int pid;
     int opt;
@@ -90,9 +90,12 @@ int main(int argc, char *argv[]) {
     }
     printf("s: %d\nU: %d\nS: %d\nv: %d\nc: %d\n", psFlags.singleChar,psFlags.userTime,psFlags.systemTime,psFlags.virtMemory,psFlags.command);
 
-    // Call print funcs
-    printf("List of PIDs:\n");
-    ll_print(pids);
-
-    ll_free(pids);
+    node* curr = pids->head;
+    for (int i = 0; i < pids->size; i++) {
+        printf("%d: ", curr->value);
+        if (psFlags.singleChar) printf("%c ", getState(curr->value));        
+        printf("\n");
+        curr = curr->next;
+    }
+    //ll_free(pids);
 }
