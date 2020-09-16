@@ -20,10 +20,14 @@ linkedlist* ll_initialize() {
 
 // adds new node with value at end
 void ll_push(linkedlist* list, int value) {
+    if (list == NULL) {
+        perror("Can't add an element to NULL.");
+        exit(EXIT_FAILURE);
+    }
+
     // construct node to add
     node* new = (node*)malloc(sizeof(node));
-    if (new == NULL) // adds new node with value at end
-    {
+    if (new == NULL) {
         perror("Error allocating memory for new node.\n");
         exit(EXIT_FAILURE);
     }
@@ -45,6 +49,11 @@ void ll_push(linkedlist* list, int value) {
 // gets value of node at index
 // returns -1 if no such node exists
 int ll_get(linkedlist* list, int index) {
+    if (list == NULL) {
+        perror("Can't get an element from NULL.");
+        exit(EXIT_FAILURE);
+    }
+    
     if (list->size <= index) return -1;
 
     node* curr = list->head;
@@ -55,6 +64,57 @@ int ll_get(linkedlist* list, int index) {
     return curr->value;
 }
 
+// remove a node from the list
+// return 1 if successful
+// return 0 if no such node exists
+int ll_remove(linkedlist* list, int value) {
+    if (list == NULL) {
+        perror("Can't remove an element from NULL.");
+        return;
+    }
+    
+    if (list->head == NULL) return 0; // list has no elements
+
+    node* curr = list->head;
+    node* prev = NULL;
+    
+    int i = 0;
+    while (curr->value != value && i < list->size) {
+        prev = curr;
+        curr = curr->next;
+        assert (curr != NULL); // list should be circularly linked
+        i++;
+    }
+
+    if (prev = NULL) { // list has one node that is the target
+
+    }
+
+
+    if (list->size == 0) {
+        return 0;
+    } else if (list->size == 1) {
+        if (list->head->value == value) {
+            free(list->head);
+            list->head == NULL;
+            list->tail == NULL;
+            list->size == 0;
+            return 1;
+        } else return 0;
+    }
+    // locate matching element
+    node* curr = list->head;
+    while (curr->next != list->head && curr->next->value != value) {
+        curr = curr->next;
+    }
+
+    if (curr->next->value == value) {
+
+    }
+
+
+}
+
 // free all memory from the specified linkedlist
 // if ptr is null, no operation is performed
 void ll_free(linkedlist* ptr) {
@@ -63,12 +123,13 @@ void ll_free(linkedlist* ptr) {
     // free all nodes
     node* curr = ptr->head;
     node* next = NULL;
-    while (ptr->size > 0) {
+    while (next != ptr->tail) {
         next = curr->next;
         free(curr);
         curr = next;
     }
 
+    free(ptr->tail)
     free(ptr);
 }
 
