@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
                 all_pids = 0;
                 pid = atoi(optarg);
                 if (pid == 0) {
-                    printf("Enter a valid (nonzero) process ID (pid) after -p.\n");
+                    perror("Enter a valid (nonzero) process ID (pid) after -p.\n");
                     exit(EXIT_FAILURE);
                 } else {
                     ll_push(pids,pid);
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
                     mem_len = atoi(argv[optind]);
                 }
                 if (mem_addr == 0 || mem_len == 0) {
-                    printf("Enter a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
+                    perror("Enter a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
                     exit(EXIT_FAILURE);
                 }
                 printf("addr: %d, len: %d\n", mem_addr, mem_len);
