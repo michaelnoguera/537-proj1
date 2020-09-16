@@ -47,7 +47,7 @@ const char getState(int pid) {
     // parse beginning of statfile
     int foundPid;
     char state;
-    fscanf(statfile, "%d (%*s)) %c", &foundPid, &state); // ignore executable name using astrisk, see https://stackoverflow.com/q/1410132/11639533
+    fscanf(statfile, "%d %*s %c", &foundPid, &state); // ignore executable name using astrisk, see https://stackoverflow.com/q/1410132/11639533
     // cleanup and validity check
     fclose(statfile);
     assert(pid == foundPid);  /* pid from stat file must match provided process pid */
@@ -55,6 +55,34 @@ const char getState(int pid) {
     return state;
 }
 // state is the third argument, with scanf specifier %c
+
+// returns the number of virtual memory pages used by the given process
+const int getVirtMemory(int pid) {
+    // construct filepath from pid
+    char* filepath;
+    if (asprintf(&filepath, "/proc/%d/statm", pid) == -1) {
+        printf("Error allocating memory to hold filepath for process number %d\n", pid);
+        exit(EXIT_FAILURE);
+    }
+
+    // attempt to access statm file
+    // TODO: Change to status file? First number in statm file != VmSize in /proc/[pid]/status
+    FILE* statfile = fopen(filepath, "r");
+    if (statfile == NULL) {
+        printf("Error accessing %s.\n", filepath);
+        exit(EXIT_FAILURE);
+    }
+    free(filepath); //upon success, filepath is no longer needed
+
+    // parse beginning of statfile
+    int pages;
+    fscanf(statfile, "%d", &pages);
+
+    // cleanup and validity check
+    fclose(statfile);
+
+    return pages;
+}
 
 const int getUserTime(int pid);
 

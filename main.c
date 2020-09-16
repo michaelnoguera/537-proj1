@@ -93,7 +93,8 @@ int main(int argc, char *argv[]) {
     node* curr = pids->head;
     for (int i = 0; i < pids->size; i++) {
         printf("%d: ", curr->value);
-        if (psFlags.singleChar) printf("%c ", getState(curr->value));        
+        if (psFlags.singleChar) printf("%c ", getState(curr->value));   
+        if (psFlags.virtMemory) printf("%d ", getVirtMemory(curr->value));      
         printf("\n");
         curr = curr->next;
     }
