@@ -1,6 +1,7 @@
 #include "linkedlist.h"
 
 #include <stdio.h>
+#include <assert.h>
 
 // initializes empty list
 // remember to call ll_free when done!
@@ -67,7 +68,7 @@ int ll_get(linkedlist* list, int index) {
 // remove a node from the list
 // return 1 if successful
 // return 0 if no such node exists
-int ll_remove(linkedlist* list, int value) {
+/*int ll_remove(linkedlist* list, int value) {
     if (list == NULL) {
         perror("Can't remove an element from NULL.");
         return;
@@ -90,30 +91,12 @@ int ll_remove(linkedlist* list, int value) {
 
     }
 
+    free(list->head);
+    list->head == NULL;
+    list->tail == NULL;
+    list->size == 0;
 
-    if (list->size == 0) {
-        return 0;
-    } else if (list->size == 1) {
-        if (list->head->value == value) {
-            free(list->head);
-            list->head == NULL;
-            list->tail == NULL;
-            list->size == 0;
-            return 1;
-        } else return 0;
-    }
-    // locate matching element
-    node* curr = list->head;
-    while (curr->next != list->head && curr->next->value != value) {
-        curr = curr->next;
-    }
-
-    if (curr->next->value == value) {
-
-    }
-
-
-}
+}*/
 
 // free all memory from the specified linkedlist
 // if ptr is null, no operation is performed
@@ -121,15 +104,15 @@ void ll_free(linkedlist* ptr) {
     if (ptr == NULL) return;
     
     // free all nodes
-    node* curr = ptr->head;
-    node* next = NULL;
-    while (next != ptr->tail) {
-        next = curr->next;
-        free(curr);
-        curr = next;
+    node* tmp = NULL;
+    while (ptr->head != ptr->tail) {
+        tmp = ptr->head;
+        ptr->head = ptr->head->next;
+        free(tmp);
     }
+    free(ptr->tail);
 
-    free(ptr->tail)
+    // free list wrapper
     free(ptr);
 }
 

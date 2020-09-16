@@ -27,7 +27,7 @@ struct Flags {
 
 int main(int argc, char *argv[]) {
     linkedlist* pids = ll_initialize();
-    int all_pids = 1;
+    int all_pids = 1; // if there's no option specified, then populate the linked list with all the user procs
     int pid;
     int opt;
     int mem_addr = 0;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
                 exit(EXIT_FAILURE);
         }
     }
-    printf("s: %d\nU: %d\nS: %d\nv: %d\nc: %d\n", psFlags.singleChar,psFlags.userTime,psFlags.systemTime,psFlags.virtMemory,psFlags.command);
+    //printf("s: %d\nU: %d\nS: %d\nv: %d\nc: %d\n", psFlags.singleChar,psFlags.userTime,psFlags.systemTime,psFlags.virtMemory,psFlags.command);
 
     node* curr = pids->head;
     for (int i = 0; i < pids->size; i++) {
@@ -98,5 +98,5 @@ int main(int argc, char *argv[]) {
         printf("\n");
         curr = curr->next;
     }
-    //ll_free(pids);
+    ll_free(pids);
 }

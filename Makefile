@@ -1,6 +1,8 @@
 DEPS=proc.h util.h linkedlist.h
 CFLAGS=-std=c99 -Wall
 
+.PHONY:clean
+
 all: 537ps
 
 537ps: proc.o main.o util.o linkedlist.o
@@ -12,8 +14,6 @@ ifeq ($(DEBUG),true)
 else
 	gcc -c -o $@ $< $(CFLAGS)
 endif
-
-.PHONY:clean
 
 clean:
 	rm *.o
