@@ -7,7 +7,11 @@ all: 537ps
 	gcc -o 537ps main.o proc.o util.o linkedlist.o
 
 %.o: %.c $(DEPS)
+ifeq ($(DEBUG),true)
+	gcc -g -c -o $@ $< $(CFLAGS)
+else
 	gcc -c -o $@ $< $(CFLAGS)
+endif
 
 .PHONY:clean
 
