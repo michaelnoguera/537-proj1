@@ -49,7 +49,7 @@ void ll_push(linkedlist* list, int value) {
 
 // gets value of node at index
 // returns -1 if no such node exists
-int ll_get(linkedlist* list, int index) {
+int ll_get(const linkedlist* list, int index) {
     if (list == NULL) {
         perror("Can't get an element from NULL.");
         exit(EXIT_FAILURE);
@@ -117,7 +117,7 @@ void ll_free(linkedlist* ptr) {
 }
 
 // print out all values in list 
-void ll_print(linkedlist* list) {
+void ll_print(const linkedlist* list) {
     node* curr = list->head;
 
     for (int i = 0; i < list->size; i++) {

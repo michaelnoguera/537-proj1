@@ -3,11 +3,10 @@
 
 #include <dirent.h> //contains readdir
 
-const char getState(int pid);
-// state is the third argument, with scanf specifier %c
+char getState(int pid);
 
-const int getUserTime(int pid);
+int getUserTime(int pid);
 
-const int getSystemTime(int pid);
+int getSystemTime(int pid);
 
-const int getVirtMemory(int pid);
+int getVirtMemory(int pid);

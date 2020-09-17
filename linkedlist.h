@@ -23,11 +23,11 @@ void ll_push(linkedlist* list, int value);
 
 // gets value of node at index
 // DANGER: returns NULL if no such node exists
-int ll_get(linkedlist* list, int index);
+int ll_get(const linkedlist* list, int index);
 
 // free all memory from the specified linkedlist
 // if ptr is null, no operation is performed
 void ll_free(linkedlist* ptr);
 
 // print out all values in list 
-void ll_print(linkedlist* list);
+void ll_print(const linkedlist* list);

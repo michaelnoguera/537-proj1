@@ -1,34 +1,38 @@
 #define _GNU_SOURCE
 
-#include "proc.h"
-
 #include <assert.h>
 #include <dirent.h>  //contains readdir
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+#include "proc.h"
+#include "linkedlist.h"
 
 // Gets a list of processes belonging to the current user.
 // Returns the processes by value as a stack-allocated 1d array.
-void getProcesses() { // TODO should this take a pointer arg to mutate
-    struct dirent* process;
-
-    // based off IBM documentation example linked from assignment page https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.bpxbd00/rtread.htm
+void getProcesses(linkedlist* pids) {
     DIR* proc;
     if ((proc = opendir("/proc/")) == NULL) {
         perror("Error accessing /proc directory.\n");
         exit(EXIT_FAILURE);
-    } else {
-        while ((process = readdir(proc)) != NULL) {
-            //max pid size stored in /proc/sys/kernel/pid_max  
+    }
 
-            // not finished
-        }
+    const int uid = (int)getuid();
+
+    struct dirent* process;
+    while ((process = readdir(proc)) != NULL) {
+        //max pid size stored in /proc/sys/kernel/pid_max  
+
+        // not finished
     }
 }
 
+
+
 // returns the state character for the given process
-const char getState(int pid) {
+char getState(int pid) {
     // construct filepath from pid
     char* filepath;
     if (asprintf(&filepath, "/proc/%d/status", pid) == -1) {
@@ -79,7 +83,7 @@ const char getState(int pid) {
 }
 
 // returns the number of virtual memory pages used by the given process
-const int getVirtMemory(int pid) {
+int getVirtMemory(int pid) {
     // construct filepath from pid
     char* filepath;
     if (asprintf(&filepath, "/proc/%d/statm", pid) == -1) {
@@ -106,6 +110,6 @@ const int getVirtMemory(int pid) {
     return pages;
 }
 
-const int getUserTime(int pid);
+int getUserTime(int pid);
 
-const int getSystemTime(int pid);
+int getSystemTime(int pid);
