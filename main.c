@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <string.h>
+#include <errno.h>
 
 #include "util.h"
 #include "linkedlist.h"
@@ -27,7 +28,6 @@ struct Flags {
 
 int main(int argc, char *argv[]) {
     linkedlist* pids = ll_initialize();
-    int all_pids = 1; // if there's no option specified, then populate the linked list with all the user procs
     int pid;
     int opt;
     int mem_addr = 0;
@@ -45,14 +45,14 @@ int main(int argc, char *argv[]) {
     while ((opt = getopt(argc, argv, "p:s::U::S::v::c::m:")) != -1) {
         switch ((char) opt) {
             case 'p':
-                all_pids = 0;
-                pid = atoi(optarg);
-                if (pid == 0) {
-                    perror("Enter a valid (nonzero) process ID (pid) after -p.\n");
+                errno = 0;
+                pid = (int)strtol(optarg, (char**)NULL, 10);
+                if (errno != 0 || pid < 0) {
+                    perror("Enter a valid process ID (pid) after -p.\n");
                     exit(EXIT_FAILURE);
-                } else {
-                    ll_push(pids,pid);
                 }
+                
+                ll_push(pids,pid);
                 break;
             case 's':
                 flipOption(optarg, &psFlags.singleChar);
@@ -90,6 +90,10 @@ int main(int argc, char *argv[]) {
     }
     //printf("s: %d\nU: %d\nS: %d\nv: %d\nc: %d\n", psFlags.singleChar,psFlags.userTime,psFlags.systemTime,psFlags.virtMemory,psFlags.command);
 
+    //if (pids->size == 0) {
+     //   getProcesses(&pids, get uid)
+    //}
+
     node* curr = pids->head;
     for (int i = 0; i < pids->size; i++) {
         printf("%d: ", curr->value);
@@ -99,4 +103,6 @@ int main(int argc, char *argv[]) {
         curr = curr->next;
     }
     ll_free(pids);
+
+    exit(EXIT_SUCCESS);
 }
