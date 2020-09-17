@@ -45,6 +45,7 @@ const char getState(int pid) {
     free(filepath); //upon success, filepath is no longer needed
 
     // parse beginning of statusfile
+    size_t bufsize = 0;
     char *statusline;
     while(1) {
         // read line into temp heap-alloc'd buffer
@@ -52,14 +53,14 @@ const char getState(int pid) {
         // then getline() will allocate a buffer for storing the line.  
         // This buffer should be freed by the user program even if getline() failed." See getline(3)
         statusline = NULL;
-        if (getline(&statusline, 0, statusfile) < 0) {
+        bufsize = 0;
+        if (getline(&statusline, &bufsize, statusfile) < 0) {
             perror("Error parsing statusfile or EOF reached without finding status.\n");
             exit(EXIT_FAILURE);
         }
         
-        printf("%s", statusline);
-		if (strstr(statusline, "Status:") != NULL) { // if statusline is the line containing the status
-            break; // "Status:" line found, parse it
+		if (strstr(statusline, "State:") != NULL) { // if statusline is the line containing the status
+            break; // "State:" line found, parse it
         } else {
             free(statusline); // continue on to next line
         }
@@ -67,11 +68,10 @@ const char getState(int pid) {
 
     // Parse the "State:" line
     char state;
-    if (sscanf(statusline, "Status: %c %*s", &state) != 2) {
-        perror("Error parsing Status: line from /proc/[pid]/Status.\n");
+    if (sscanf(statusline, "State: %c %*s", &state) != 1) {
+        perror("Error parsing State: line from /proc/[pid]/status.\n");
         exit(EXIT_FAILURE);
     }
-    printf("%c\n",state);
     
     fclose(statusfile);
     free(statusline);
