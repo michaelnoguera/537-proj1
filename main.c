@@ -3,7 +3,7 @@
 
 
 /* main: parses command line arguments and constructs output
- * returns 0 upon success
+ * exits with code 0 upon success
  */
 
 #include <unistd.h>
@@ -17,23 +17,15 @@
 #include "linkedlist.h"
 #include "proc.h"
 
-struct Flags {
-    int singleChar;
-    int userTime;
-    int systemTime;
-    int virtMemory;
-    int command;
-    int procMem;
-};   
+// For "fancy" output
+#define INVERT(string) "\e[7m" string "\e[27m"
 
 int main(int argc, char *argv[]) {
     linkedlist* pids = ll_initialize();
-    int pid;
-    int opt;
     int mem_addr = 0;
     int mem_len = 0;
 
-    struct Flags psFlags = {
+    Flags psFlags = {
         .singleChar = 0,
         .userTime = 1,
         .systemTime = 0,
@@ -42,12 +34,13 @@ int main(int argc, char *argv[]) {
         .procMem = 0,
     };
 
+    int opt = 0;
     while ((opt = getopt(argc, argv, "p:s::U::S::v::c::m:")) != -1) {
         switch ((char) opt) {
             case 'p':
                 errno = 0;
-                pid = (int)strtol(optarg, (char**)NULL, 10);
-                if (errno != 0 || pid < 0) {
+                int pid = (int)strtol(optarg, (char**)NULL, 10);
+                if (errno != 0 || pid <= 0) {
                     perror("Enter a valid process ID (pid) after -p.\n");
                     exit(EXIT_FAILURE);
                 }
@@ -90,15 +83,25 @@ int main(int argc, char *argv[]) {
     }
     //printf("s: %d\nU: %d\nS: %d\nv: %d\nc: %d\n", psFlags.singleChar,psFlags.userTime,psFlags.systemTime,psFlags.virtMemory,psFlags.command);
 
-    //if (pids->size == 0) {
-     //   getProcesses(&pids, get uid)
-    //}
+    // if no pid(s) are specified, find all of the current user's pids
+    if (pids->size == 0) {
+        getCurrentUserProcesses(&pids);
+    }
 
+    // PRINT HEADER
+    //printf("\e[7m"); // Invert header color
+    printf("%7s ", "PID");
+    if (psFlags.singleChar) printf("%-5s ", "STATE");   
+    if (psFlags.virtMemory) printf("%-10s ", "V. MEM");
+    //printf("\e[27m");
+    printf("\n");
+
+    // PRINT PROCESS INFO
     node* curr = pids->head;
     for (int i = 0; i < pids->size; i++) {
-        printf("%d: ", curr->value);
-        if (psFlags.singleChar) printf("%c ", getState(curr->value));   
-        if (psFlags.virtMemory) printf("%d ", getVirtMemory(curr->value));      
+        printf("%7d ", curr->value);
+        if (psFlags.singleChar) printf("%-5c ", getState(curr->value));   
+        if (psFlags.virtMemory) printf("%-10d ", getVirtMemory(curr->value));      
         printf("\n");
         curr = curr->next;
     }
