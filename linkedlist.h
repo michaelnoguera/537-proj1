@@ -1,5 +1,8 @@
 #include <stdlib.h>
 
+#ifndef _LINKEDLIST_
+#define _LINKEDLIST_
+
 // node type for linkedlist_t
 typedef struct ll_node_t {
     int value;
@@ -31,3 +34,5 @@ void ll_free(linkedlist* ptr);
 
 // print out all values in list 
 void ll_print(const linkedlist* list);
+
+#endif
