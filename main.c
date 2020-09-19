@@ -17,9 +17,6 @@
 #include "linkedlist.h"
 #include "proc.h"
 
-// For "fancy" output
-#define INVERT(string) "\e[7m" string "\e[27m"
-
 int main(int argc, char *argv[]) {
     linkedlist* pids = ll_initialize();
     int mem_addr = 0;
@@ -89,19 +86,17 @@ int main(int argc, char *argv[]) {
     }
 
     // PRINT HEADER
-    //printf("\e[7m"); // Invert header color
-    printf("%7s ", "PID");
-    if (psFlags.singleChar) printf("%-5s ", "STATE");   
-    if (psFlags.virtMemory) printf("%-10s ", "V. MEM");
-    //printf("\e[27m");
-    printf("\n");
+    //printf("%s ", "PID");
+    //if (psFlags.singleChar) printf("%s ", "STATE");   
+    //if (psFlags.virtMemory) printf("%s ", "V. MEM");
+    //printf("\n");
 
     // PRINT PROCESS INFO
     node* curr = pids->head;
     for (int i = 0; i < pids->size; i++) {
-        printf("%7d ", curr->value);
-        if (psFlags.singleChar) printf("%-5c ", getState(curr->value));   
-        if (psFlags.virtMemory) printf("%-10d ", getVirtMemory(curr->value));      
+        printf("%6d: ", curr->value);
+        if (psFlags.singleChar) printf("%c ", getState(curr->value));   
+        if (psFlags.virtMemory) printf("%d ", getVirtMemory(curr->value));   
         printf("\n");
         curr = curr->next;
     }
