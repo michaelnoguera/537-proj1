@@ -144,6 +144,53 @@ int getUserTime(int pid);
 
 int getSystemTime(int pid);
 
+char* getCmdline(int pid) {
+    // construct filepath from pid
+    char* filepath;
+    if (asprintf(&filepath, "/proc/%d/cmdline", pid) == -1) {
+        printf("Error allocating memory to hold filepath for process number %d\n", pid);
+        exit(EXIT_FAILURE);
+    }
+
+    // attempt to access cmdline file
+    FILE* cmdline_file = fopen(filepath, "r");
+    if (cmdline_file == NULL) {
+        printf("Error accessing %s.\n", filepath);
+        exit(EXIT_FAILURE);
+    }
+    free(filepath); //upon success, filepath is no longer needed
+
+    // Set buffer for use with getdelim, and declare pointers to 
+    size_t bufsize = 0;
+    char *cmdline = NULL;
+    char *cmdline_temp; // string that holds each arg parsed by getdelim
+
+    // Loop through each arg (separated by null bytes) in the cmdline file with getdelim,
+    // storing the result in cmdline_temp.
+    // TODO: add error handling? it will just stop if it finds an error, unfortunately this can't
+    // readily be converted to an infinite-while with an if statement because even when it works
+    // as intendended, getdelim returns an error at the end of the string.
+    while (getdelim(&cmdline_temp, &bufsize, 0, cmdline_file) != -1) {
+        if (cmdline == NULL) {
+            // Print the new arg alone to cmdline.
+            asprintf(&cmdline, "%s", cmdline_temp);
+        } else {
+            // Use asprintf to extend the current string.
+            // Note: we prevent a memory leak by setting a pointer to the same address
+            // that cmdline currently has and freeing it, so that when asprintf gives
+            // a new address, the old one doesn't stick around.
+
+            char *tmp_cmdline_oldaddr = cmdline;
+            asprintf(&cmdline, "%s %s", cmdline, cmdline_temp);
+            free(tmp_cmdline_oldaddr);
+        }
+    }
+
+    free(cmdline_temp);
+    fclose(cmdline_file);
+    return cmdline;
+}
+
 // Gets a list of processes belonging to the current user.
 // Adds the user processes' pids to the provided linked list
 void getCurrentUserProcesses(linkedlist** pids) {

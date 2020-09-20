@@ -97,6 +97,10 @@ int main(int argc, char *argv[]) {
         printf("%6d: ", curr->value);
         if (psFlags.singleChar) printf("%c ", getState(curr->value));   
         if (psFlags.virtMemory) printf("%d ", getVirtMemory(curr->value));   
+        if (psFlags.command) {
+            char *cmdline_str = getCmdline(curr->value);
+            printf("[%s]", cmdline_str);
+            free(cmdline_str);
         printf("\n");
         curr = curr->next;
     }

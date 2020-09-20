@@ -14,3 +14,5 @@ int getUserTime(int pid);
 int getSystemTime(int pid);
 
 int getVirtMemory(int pid);
+
+char* getCmdline(int pid);

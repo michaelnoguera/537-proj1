@@ -65,39 +65,6 @@ int ll_get(const linkedlist* list, int index) {
     return curr->value;
 }
 
-// remove a node from the list
-// return 1 if successful
-// return 0 if no such node exists
-/*int ll_remove(linkedlist* list, int value) {
-    if (list == NULL) {
-        perror("Can't remove an element from NULL.");
-        return;
-    }
-    
-    if (list->head == NULL) return 0; // list has no elements
-
-    node* curr = list->head;
-    node* prev = NULL;
-    
-    int i = 0;
-    while (curr->value != value && i < list->size) {
-        prev = curr;
-        curr = curr->next;
-        assert (curr != NULL); // list should be circularly linked
-        i++;
-    }
-
-    if (prev = NULL) { // list has one node that is the target
-
-    }
-
-    free(list->head);
-    list->head == NULL;
-    list->tail == NULL;
-    list->size == 0;
-
-}*/
-
 // free all memory from the specified linkedlist
 // if ptr is null, no operation is performed
 void ll_free(linkedlist* ptr) {
