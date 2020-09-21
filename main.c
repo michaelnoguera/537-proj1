@@ -32,13 +32,13 @@ int main(int argc, char *argv[]) {
     };
 
     int opt = 0;
-    while ((opt = getopt(argc, argv, "p:s::U::S::v::c::m:")) != -1) {
+    while ((opt = getopt(argc, argv, "-p:s::U::S::v::c::m:")) != -1) {
         switch ((char) opt) {
             case 'p':
                 errno = 0;
                 int pid = (int)strtol(optarg, (char**)NULL, 10);
                 if (errno != 0 || pid <= 0) {
-                    perror("Enter a valid process ID (pid) after -p.\n");
+                    printf("Enter a valid process ID (pid) after -p.\n");
                     exit(EXIT_FAILURE);
                 }
                 
@@ -68,11 +68,12 @@ int main(int argc, char *argv[]) {
                     mem_len = atoi(argv[optind]);
                 }
                 if (mem_addr == 0 || mem_len == 0) {
-                    perror("Enter a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
+                    printf("Enter a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
                     exit(EXIT_FAILURE);
                 }
                 printf("addr: %d, len: %d\n", mem_addr, mem_len);
                 break;
+            case 1:
             default:
                 printf("Usage: 537ps [-p <pid>] [-s] [-U] [-S] [-v] [-c] [-m <addr> <len>]\n");
                 exit(EXIT_FAILURE);
