@@ -18,10 +18,13 @@
 #include "proc.h"
 
 int main(int argc, char *argv[]) {
+    // Initialize linked list to hold the list of pids.
     linkedlist* pids = ll_initialize();
     int mem_addr = 0;
     int mem_len = 0;
 
+    // Store the program's option flags, 1 = on & 0 = off.
+    // Note: Default values are encoded in this step.
     Flags psFlags = {
         .singleChar = 0,
         .userTime = 1,
@@ -33,15 +36,20 @@ int main(int argc, char *argv[]) {
 
     int opt = 0;
     while ((opt = getopt(argc, argv, "-p:s::U::S::v::c::m:")) != -1) {
+        // PARSE FLAGS
+        // For each valid yes/no option (matching the optarg specification), we flip the value of the
+        // flag in the psFlags struct depending on if an extra "-" character has been added to the end of the
+        // option.
         switch ((char) opt) {
             case 'p':
                 errno = 0;
                 int pid = (int)strtol(optarg, (char**)NULL, 10);
+                // Ensure that integer PID number parsed from optarg is valid, error if not
                 if (errno != 0 || pid <= 0) {
                     printf("Enter a valid process ID (pid) after -p.\n");
                     exit(EXIT_FAILURE);
                 }
-                
+                // Add pid to Pids linked list.
                 ll_push(pids,pid);
                 break;
             case 's':
@@ -60,13 +68,15 @@ int main(int argc, char *argv[]) {
                 flipOption(optarg, &psFlags.command);
                 break;
             case 'm':
-                // 'm' option has arguments itself, parsing for these options will need to be added.
                 psFlags.procMem = 1;
+                // For -m we check that the correct number of arguments have been supplied, and attempt to parse.
+                // That is, there should be at least 2 valid arguments after "-m" was parsed (optind-1).
                 if (optind < argc) {
                     // Add error handling case? The assignment doesn't specify if it's okay for the program to *also* accept hex addresses without '0x'.
                     mem_addr = (int)strtol(argv[optind-1], NULL, 16);
                     mem_len = atoi(argv[optind]);
                 }
+                // If any error has occured in parsing both optargs, issue an error.
                 if (mem_addr == 0 || mem_len == 0) {
                     printf("Enter a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
                     exit(EXIT_FAILURE);
@@ -79,18 +89,11 @@ int main(int argc, char *argv[]) {
                 exit(EXIT_FAILURE);
         }
     }
-    //printf("s: %d\nU: %d\nS: %d\nv: %d\nc: %d\n", psFlags.singleChar,psFlags.userTime,psFlags.systemTime,psFlags.virtMemory,psFlags.command);
 
     // if no pid(s) are specified, find all of the current user's pids
     if (pids->size == 0) {
         getCurrentUserProcesses(&pids);
     }
-
-    // PRINT HEADER
-    //printf("%s ", "PID");
-    //if (psFlags.singleChar) printf("%s ", "STATE");   
-    //if (psFlags.virtMemory) printf("%s ", "V. MEM");
-    //printf("\n");
 
     // PRINT PROCESS INFO
     node* curr = pids->head;
@@ -101,6 +104,7 @@ int main(int argc, char *argv[]) {
         if (psFlags.systemTime) printf("stime=%lu ", getSystemTime(curr->value));
         if (psFlags.virtMemory) printf("%d ", getVirtMemory(curr->value));   
         if (psFlags.command) {
+            // For cmdline, we take the str and then free it once it's been printed.
             char *cmdline_str = getCmdline(curr->value);
             printf("[%s]", cmdline_str);
             free(cmdline_str);
@@ -108,6 +112,8 @@ int main(int argc, char *argv[]) {
         printf("\n");
         curr = curr->next;
     }
+    
+    // Free pids linked list recursively.
     ll_free(pids);
 
     exit(EXIT_SUCCESS);

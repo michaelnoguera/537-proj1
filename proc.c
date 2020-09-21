@@ -156,7 +156,8 @@ char* getCmdline(int pid) {
     }
     free(filepath); //upon success, filepath is no longer needed
 
-    // Set buffer for use with getdelim, and declare pointers to 
+    // Set buffer size for use with getdelim, and declare pointers to the entire cmdline string
+    // as well as each sub-arg.
     size_t bufsize = 0;
     char *cmdline = NULL;
     char *cmdline_temp; // string that holds each arg parsed by getdelim
