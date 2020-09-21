@@ -16,7 +16,6 @@
 #include "util.h"
 #include "linkedlist.h"
 #include "proc.h"
-#include "proc/stat.h"
 
 int main(int argc, char *argv[]) {
     linkedlist* pids = ll_initialize();
@@ -98,6 +97,7 @@ int main(int argc, char *argv[]) {
         printf("%6d: ", curr->value);
         if (psFlags.singleChar) printf("%c ", getState(curr->value));   
         if (psFlags.userTime) printf("utime=%lu ", getUserTime(curr->value));
+        if (psFlags.systemTime) printf("stime=%lu ", getSystemTime(curr->value));
         if (psFlags.virtMemory) printf("%d ", getVirtMemory(curr->value));   
         if (psFlags.command) {
             char *cmdline_str = getCmdline(curr->value);
