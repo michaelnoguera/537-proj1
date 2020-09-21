@@ -229,29 +229,38 @@ static int readPid(FILE* statfile) {
 }
 
 
+
+// Recursively consumes the "comm" (second) field of the /stat file
+// in a safe manner by taking advantage of the automatic truncation
+// at a specified length and searching backwards for the end parenthesis
+static void skipCommHelper(FILE* buf, int depth, int* len) {
+    // borrow character from buffer
+    char c;
+    if ((c = fgetc(buf)) == EOF || ferror(buf)) {
+        perror("Invalid /proc/[pid]/stat file provided, EOF reached, or error reading stream.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // recur downward until max length reached
+    if (*len > depth) skipCommHelper(buf, depth+1, len);
+    
+    // find end, and return the rest of the characters to the buffer
+    if (depth == *len && c != ')')
+    {
+        (*len)--;
+        ungetc(c, buf);
+    }
+}
+
+
 // Reads and ignores the "comm" (second) field of the /stat file
-// Fails if unpaired parenthesis are present in the "comm" field for parsing
-// safety
-// Advances the provided file buffer
 static void skipComm(FILE* statfile) {
     assert(statfile != NULL && !ferror(statfile) && !feof(statfile));
 
-    int openParens = 0;
-    for (int i = 0; i < 18; i++){
-        char c = fgetc(statfile); // read next character
-        
-        // Stop reading on the last open parenthesis. If the executable filename would
-        // unsafely inject a ')' into this field, error out with explanation.
-        if (c == '(') openParens++;
-        if (c == ')') openParens--;
-        if (openParens < 0) {
-            perror("The /proc/[pid]/stat file cannot be safely parsed when the command\
-            field contains unmatched parenthesis.\n");
-            exit(EXIT_FAILURE);
-        }
-        if (openParens == 0 && c == ')') break;
-    }
-    fgetc(statfile); // consume trailing space
+    int maxlen = 18;
+    skipCommHelper(statfile, 1, &maxlen);
+
+    assert(fgetc(statfile) == ' '); // consume trailing space
     return;
 }
 
