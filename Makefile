@@ -1,11 +1,14 @@
-DEPS=proc.h util.h linkedlist.h
+DEPS=proc/*.h proc.h util.h linkedlist.h
 CFLAGS=-std=c99 -Wall
 
 .PHONY:clean
 
 all: 537ps
 
-537ps: proc.o main.o util.o linkedlist.o
+proc: proc/*.o
+	gcc -o proc proc/*.o
+
+537ps: proc main.o util.o linkedlist.o
 	gcc -o 537ps main.o proc.o util.o linkedlist.o
 
 %.o: %.c $(DEPS)

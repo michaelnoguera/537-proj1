@@ -1,6 +1,7 @@
 // CS 537 Programming Assignment 1 (Fall 2020)
 // Michael Noguera and Julien de Castelnau
 
+#include "proc/stat.h"
 #include "linkedlist.h"
 
 // Gets a list of processes belonging to the current user.
@@ -8,10 +9,6 @@
 void getCurrentUserProcesses(linkedlist** pids);
 
 char getState(int pid);
-
-unsigned long getUserTime(int pid);
-
-int getSystemTime(int pid);
 
 int getVirtMemory(int pid);
 

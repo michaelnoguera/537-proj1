@@ -16,6 +16,7 @@
 #include "util.h"
 #include "linkedlist.h"
 #include "proc.h"
+#include "proc/stat.h"
 
 int main(int argc, char *argv[]) {
     linkedlist* pids = ll_initialize();
