@@ -96,11 +96,13 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < pids->size; i++) {
         printf("%6d: ", curr->value);
         if (psFlags.singleChar) printf("%c ", getState(curr->value));   
+        if (psFlags.userTime) printf("utime=%lu ", getUserTime(curr->value));
         if (psFlags.virtMemory) printf("%d ", getVirtMemory(curr->value));   
         if (psFlags.command) {
             char *cmdline_str = getCmdline(curr->value);
             printf("[%s]", cmdline_str);
             free(cmdline_str);
+        }
         printf("\n");
         curr = curr->next;
     }
