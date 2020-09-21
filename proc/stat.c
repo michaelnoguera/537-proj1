@@ -179,7 +179,7 @@ unsigned long getSystemTime(int pid) {
     skiplu(statfile); // (12) majflt %lu
     skiplu(statfile); // (13) cmajflt %lu
     skiplu(statfile); // (14) utime  %lu
-
+    
     // (15) stime  %lu
     unsigned long systemTime = 0;
     if (fscanf(statfile, "%lu ", &systemTime) !=  1 || ferror(statfile)) {

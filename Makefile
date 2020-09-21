@@ -5,11 +5,11 @@ CFLAGS=-std=c99 -Wall
 
 all: 537ps
 
-proc: proc/*.o
-	gcc -o proc proc/*.o
+537ps: proc.o main.o util.o linkedlist.o
+	gcc -o 537ps proc.o main.o util.o linkedlist.o
 
-537ps: proc main.o util.o linkedlist.o
-	gcc -o 537ps main.o proc.o util.o linkedlist.o
+proc.o:
+	make -C proc/
 
 %.o: %.c $(DEPS)
 ifeq ($(DEBUG),true)
@@ -20,5 +20,5 @@ endif
 
 clean:
 	rm *.o
+	rm proc/*.o
 	rm 537ps
-
