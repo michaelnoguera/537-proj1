@@ -9,7 +9,7 @@ void getCurrentUserProcesses(linkedlist** pids);
 
 char getState(int pid);
 
-int getUserTime(int pid);
+unsigned long getUserTime(int pid);
 
 int getSystemTime(int pid);
 
