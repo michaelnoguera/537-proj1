@@ -72,15 +72,15 @@ int main(int argc, char *argv[]) {
                 // For -m we check that the correct number of arguments have been supplied, and attempt to parse.
                 // That is, there should be at least 2 valid arguments after "-m" was parsed (optind-1).
                 if (optind < argc) {
-                    // Add error handling case? The assignment doesn't specify if it's okay for the program to *also* accept hex addresses without '0x'.
                     mem_addr = (int)strtol(argv[optind-1], NULL, 16);
-                    mem_len = atoi(argv[optind]);
+                    mem_len = (int)strtol(argv[optind], NULL, 10);
                 }
                 // If any error has occured in parsing both optargs, issue an error.
                 if (mem_addr == 0 || mem_len == 0) {
                     printf("Enter a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
                     exit(EXIT_FAILURE);
                 }
+                optind += 1;
                 printf("addr: %d, len: %d\n", mem_addr, mem_len);
                 break;
             case 1:
@@ -109,6 +109,7 @@ int main(int argc, char *argv[]) {
             printf("[%s]", cmdline_str);
             free(cmdline_str);
         }
+        if (psFlags.procMem) printf("\n"); readMem(curr->value,mem_addr,mem_len);
         printf("\n");
         curr = curr->next;
     }

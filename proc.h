@@ -13,6 +13,8 @@ int getVirtMemory(int pid);
 
 char* getCmdline(int pid);
 
+void readMem(int pid, int offset, int len);
+
 // Get the user time for a specified process
 // Fails if process command contains unpaired parenthesis
 unsigned long getUserTime(int pid);

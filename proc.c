@@ -8,6 +8,12 @@
 #include <unistd.h>
 #include <errno.h>
 
+// -m includes
+
+#include <sys/ptrace.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "proc.h"
 
 // returns the state character for the given process
@@ -160,33 +166,73 @@ char* getCmdline(int pid) {
     // as well as each sub-arg.
     size_t bufsize = 0;
     char *cmdline = NULL;
-    char *cmdline_temp; // string that holds each arg parsed by getdelim
+    char *arg = NULL; // string that holds each arg parsed by getdelim
 
     // Loop through each arg (separated by null bytes) in the cmdline file with getdelim,
-    // storing the result in cmdline_temp.
+    // storing the result in arg.
     // TODO: add error handling? it will just stop if it finds an error, unfortunately this can't
     // readily be converted to an infinite-while with an if statement because even when it works
     // as intendended, getdelim returns an error at the end of the string.
-    while (getdelim(&cmdline_temp, &bufsize, 0, cmdline_file) != -1) {
+    while (getdelim(&arg, &bufsize, 0, cmdline_file) != -1) {
         if (cmdline == NULL) {
             // Print the new arg alone to cmdline.
-            asprintf(&cmdline, "%s", cmdline_temp);
+            asprintf(&cmdline, "%s", arg);
         } else {
             // Use asprintf to extend the current string.
             // Note: we prevent a memory leak by setting a pointer to the same address
             // that cmdline currently has and freeing it, so that when asprintf gives
             // a new address, the old one doesn't stick around.
 
-            char *tmp_cmdline_oldaddr = cmdline;
-            asprintf(&cmdline, "%s %s", cmdline, cmdline_temp);
-            free(tmp_cmdline_oldaddr);
+            char *temp = cmdline;
+            asprintf(&cmdline, "%s %s", cmdline, arg);
+            free(temp);
         }
     }
 
-    free(cmdline_temp);
+    free(arg);
     fclose(cmdline_file);
     return cmdline;
 }
+
+/*
+void readMem(int pid, int offset, int len) {
+    char buf;
+
+    // construct filepath from pid
+    char* filepath;
+    if (asprintf(&filepath, "/proc/%d/mem", pid) == -1) {
+        printf("Error allocating memory to hold filepath for process number %d\n", pid);
+        exit(EXIT_FAILURE);
+    }
+
+    // attempt to access cmdline file
+    int mem_fd = open(filepath, O_RDONLY);
+    if (mem_fd == NULL) {
+        printf("Error accessing %s.\n Are the permissions set correctly for PTRACE_ATTACH? (Try as root)", filepath);
+        exit(EXIT_FAILURE);
+    }
+    free(filepath); //upon success, filepath is no longer needed
+
+    // from StackOverflow post linked on assignment page
+    ptrace(PTRACE_ATTACH, pid, NULL, NULL); // obtain lock on proc mem
+    waitpid(pid, NULL, 0); // make sure proc isn't active
+    lseek(mem_fd, offset, SEEK_SET);
+
+    //char *outstring;
+    for (int i=0; i < len; i++) {
+        int readOutput = -1;
+
+        if ((readOutput = read(mem_fd, &buf, 1)) < 0) {
+            perror("Error reading from mem file.\n");
+            exit(EXIT_FAILURE);
+        }
+        printf("%02x ", buf);
+    }
+    
+    ptrace(PTRACE_DETACH, pid, NULL, NULL);
+
+}
+*/
 
 // Gets a list of processes belonging to the current user.
 // Adds the user processes' pids to the provided linked list
@@ -212,7 +258,7 @@ void getCurrentUserProcesses(linkedlist** pids) {
         }
     }
 
-    return;
+    closedir(proc);
 }
 
 // Reads and returns the "pid" (first) field of the /stat file
