@@ -9,13 +9,41 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <getopt.h>
 #include <string.h>
 #include <errno.h>
 
-#include "util.h"
 #include "linkedlist.h"
 #include "proc.h"
+
+
+// Struct containing boolean values for each flag the program handles
+typedef struct Flags_t {
+    bool singleChar;
+    bool userTime;
+    bool systemTime;
+    bool virtMemory;
+    bool command;
+    bool procMem;
+} Flags;
+
+// toggles a command line option to the opposite of its current value if
+// specified with a trailing dash
+static void flipOption(char *optarg, bool *opt) {
+    if (optarg != 0) 
+    {
+        if (strcmp(optarg,"-") == 0) {
+            *opt = false;
+        } else {
+            printf("Cannot group options.\n");
+            printf("Usage: 537ps [-p <pid>] [-s] [-U] [-S] [-v] [-c] [-m <addr> <len>]\n");
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        *opt = true;
+    }
+}
 
 int main(int argc, char *argv[]) {
     // Initialize linked list to hold the list of pids.
@@ -95,6 +123,11 @@ int main(int argc, char *argv[]) {
         getCurrentUserProcesses(&pids);
     }
 
+    if (pids->size != 1 && psFlags.procMem) {
+        printf("The -m option is incompatible with multiple processes.\
+        Please specify only one pid using the -p flag.\n");
+    }
+
     // PRINT PROCESS INFO
     node* curr = pids->head;
     for (int i = 0; i < pids->size; i++) {
@@ -109,7 +142,7 @@ int main(int argc, char *argv[]) {
             printf("[%s]", cmdline_str);
             free(cmdline_str);
         }
-        if (psFlags.procMem) printf("\n"); readMem(curr->value,mem_addr,mem_len);
+        //if (psFlags.procMem) printf("\n"); readMem(curr->value,mem_addr,mem_len);
         printf("\n");
         curr = curr->next;
     }

@@ -194,6 +194,25 @@ char* getCmdline(int pid) {
     return cmdline;
 }
 
+/*static bool isValidMem(int pid, int offset, int len) {
+    // construct filepath from pid
+    char* filepath;
+    if (asprintf(&filepath, "/proc/%d/maps", pid) == -1) {
+        printf("Error allocating memory to hold filepath for process number %d\n", pid);
+        exit(EXIT_FAILURE);
+    }
+
+    // create statusfile input stream
+    FILE* mapsfile = fopen(filepath, "r");
+    if (mapsfile == NULL) {
+        printf("Error accessing %s.\n", filepath);
+        exit(EXIT_FAILURE);
+    }
+    free(filepath); //upon success, filepath is no longer needed
+
+
+}*/
+
 /*
 void readMem(int pid, int offset, int len) {
     char buf;
@@ -223,7 +242,7 @@ void readMem(int pid, int offset, int len) {
         int readOutput = -1;
 
         if ((readOutput = read(mem_fd, &buf, 1)) < 0) {
-            perror("Error reading from mem file.\n");
+            printf("\n");
             exit(EXIT_FAILURE);
         }
         printf("%02x ", buf);
