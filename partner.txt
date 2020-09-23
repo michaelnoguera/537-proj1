@@ -1,0 +1,2 @@
+netid: mnoguera, csl: noguera
+netid: decastelnau, csl: de-castelnau
