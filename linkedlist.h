@@ -3,36 +3,59 @@
 #ifndef _LINKEDLIST_
 #define _LINKEDLIST_
 
-// node type for linkedlist_t
+/** Node type for linkedlist_t, that holds a single integer value. */
 typedef struct ll_node_t {
-    int value;
-    struct ll_node_t* next;
+    int value; /**< the value stored in the node */ 
+    struct ll_node_t* next; /**< pointer to the next node in the list */
 } node;
 
-// Implementation of heap-allocated circular singly-linked list with head and tail pointers
-// order is not guaranteed when multiple nodes have the same value
+/**
+ * Implementation of heap-allocated circular singly-linked list with head 
+ * and tail pointers. Order is not guaranteed when multiple nodes have the
+ * same value, especially after remove operations.
+ */
 typedef struct linkedlist_t {
-    int size;
-    struct ll_node_t* head;
-    struct ll_node_t* tail;
+    int size; /**< number of items currently in the list*/
+    struct ll_node_t* head; /**< pointer to the head of the list*/
+    struct ll_node_t* tail; /**< pointer to the tail of the list*/
 } linkedlist;
 
-// initializes empty list
-// remember to call ll_free when done!
+/**
+ * Initializes a new empty linkedlist.
+ * Remember to call ll_free when done!
+ */
 linkedlist* ll_initialize();
 
-// adds new node with value at end
+/**
+ * Adds a new node to the end of a linkedlist.
+ * 
+ * @param list The list to append to.
+ * @param value The value of the new node.
+ */
 void ll_push(linkedlist* list, int value);
 
-// gets value of node at index
-// DANGER: returns NULL if no such node exists
+/**
+ * Gets the value of the node at an index.
+ * 
+ * @param list The list to search.
+ * @param index The index of the node to be retrieved. Lists are zero-indexed.
+ * @return The value of the node, or NULL if no such node exists.
+ */
 int ll_get(const linkedlist* list, int index);
 
-// free all memory from the specified linkedlist
-// if ptr is null, no operation is performed
+/**
+ * Frees all memory from the specified linkedlist.
+ * If  `ptr` is NULL, no operation is performed.
+ * 
+ * @param ptr Pointer to linkedlist to be freed.
+ */
 void ll_free(linkedlist* ptr);
 
-// print out all values in list 
+/**
+ * Prints all values from the specified linkedlist.
+ * 
+ * @param list The list to print.
+ */
 void ll_print(const linkedlist* list);
 
 #endif

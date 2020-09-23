@@ -3,22 +3,78 @@
 
 #include "linkedlist.h"
 
-// Gets a list of processes belonging to the current user.
-// Adds the user processes' pids to the provided linked list
+/**
+ * Ennumerates the current user's processes, and adds them to a provided list.
+ * 
+ * @param pids LinkedList to add found pids to.
+ */
 void getCurrentUserProcesses(linkedlist** pids);
 
+/**
+ * Returns the current state of the given process. 
+ * Reads from /proc/[pid]/status.
+ * 
+ * @param pid The process in question.
+ * @return The status character for the process. See proc(5) for a list of options and
+ * their meanings.
+ */
 char getState(int pid);
 
+/**
+ * Returns the real uid (the uid of the user that created the process) given a pid. 
+ * Reads from /proc/[pid]/status.
+ * 
+ * @param pid The process in question.
+ * @return The real (not effective) user id.
+ */
+int getUid(int pid);
+
+/**
+ * Returns the current virtual memory usage of the specified process. 
+ * Reads from /proc/[pid]/statm.
+ * 
+ * @param pid The process in question.
+ * @return the number of virtual memory pages used by the current process.
+ */
 int getVirtMemory(int pid);
 
+/**
+ * Gets the command line used to invoke the program with given pid. 
+ * Depends on /proc/[pid]/cmdline.
+ * 
+ * @param pid The process in question.
+ * @return A heap-allocated string containing the command line invocation. May contain 
+ * spaces, as flags are included. This memory must be freed by the callee.
+ */
 char* getCmdline(int pid);
 
+/**
+ * Reads the specified memory range from a process, and returns a formatted string 
+ * with its contents.
+ * 
+ * @param pid The process in question.
+ * @param offset Memory address in the VAS to start reading from.
+ * @param len Amount of memory to be read, in bytes.
+ * 
+ * @return A heap-allocated formatted string with the requested memory contents 
+ * in hexadecimal. This memory must be freed by the callee.
+ */
 char* readMem(int pid, unsigned long offset, int len);
 
-// Get the user time for a specified process
-// Fails if process command contains unpaired parenthesis
+/**
+ * Gets the user time for a specified process. 
+ * Reads from /proc/[pid]/stat.
+ * 
+ * @param pid The process in question.
+ * @return User time of the process.
+ */
 unsigned long getUserTime(int pid);
 
-// Get the system time for a specified process
-// Fails if process command contains unpaired parenthesis
+/**
+ * Gets the system time for a specified process. 
+ * Reads from /proc/[pid]/stat.
+ * 
+ * @param pid The process in question.
+ * @return System time of the process.
+ */
 unsigned long getSystemTime(int pid);
