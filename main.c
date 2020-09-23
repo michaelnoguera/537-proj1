@@ -1,8 +1,10 @@
-// CS 537 Programming Assignment 1 (Fall 2020)
-// Michael Noguera and Julien de Castelnau
-
-/* main: parses command line arguments and constructs output
- * exits with code 0 upon success
+/** 
+ * CS 537 Programming Assignment 1 (Fall 2020)
+ * @authors Michael Noguera and Julien de Castelnau
+ * @date 9/23/2020
+ *
+ * @file main.c
+ * @brief parses command line arguments, constructs and prints output
  */
 
 #include <assert.h>
@@ -17,19 +19,27 @@
 #include "linkedlist.h"
 #include "proc.h"
 
-// Struct containing boolean values for each flag the program handles
+/// Contains boolean values for each flag the program handles
 typedef struct Flags_t {
-    bool singleChar;
-    bool userTime;
-    bool systemTime;
-    bool virtMemory;
-    bool command;
-    bool procMem;
+    bool singleChar; ///< `-s` status character
+    bool userTime; ///< `-U` user time
+    bool systemTime; ///< `-S` system time
+    bool virtMemory; ///< `-v` current virtual memory usage
+    bool command; ///< `-c` command-line that started program
+    bool procMem; ///< extra credit: `-m` contents of process's memory
 } Flags;
 
-// toggles a command line option to the opposite of its current value if
-// specified with a trailing dash
-static void flipOption(char *optarg, bool *opt) {
+/**
+ * Helper function used for parsing command line flags. 
+ * 
+ * Toggles an option to the opposite of its current value if the option is
+ * specified with a trailing dash.
+ * 
+ * @param optarg provided by getopt, the flag in question and its arguments
+ * @param opt boolean flag representing the option's status. Will be toggled 
+ * if needed.
+ */
+static void flipOption(const char *optarg, bool *opt) {
     if (optarg != 0) {
         if (strcmp(optarg, "-") == 0) {
             *opt = false;
@@ -43,6 +53,13 @@ static void flipOption(char *optarg, bool *opt) {
     }
 }
 
+/**
+ * Main. Parses command line args and handles output.
+ * 
+ * @param argc number of command line arguments
+ * @param argv command line arguments
+ * @return EXIT_SUCCESS upon success, EXIT_FAILURE upon error.
+ */
 int main(int argc, char *argv[]) {
     // Initialize linked list to hold the list of pids.
     linkedlist *pids = ll_initialize();
@@ -50,14 +67,14 @@ int main(int argc, char *argv[]) {
     int mem_len = 0;
 
     // Store the program's option flags, 1 = on & 0 = off.
-    // Note: Default values are encoded in this step.
+    // Default values are encoded in this step.
     Flags psFlags = {
-        .singleChar = 0,
-        .userTime = 1,
-        .systemTime = 0,
-        .virtMemory = 0,
-        .command = 1,
-        .procMem = 0,
+        .singleChar = false,
+        .userTime = true,
+        .systemTime = false,
+        .virtMemory = false,
+        .command = true,
+        .procMem = false,
     };
 
     int opt = 0;
@@ -75,8 +92,8 @@ int main(int argc, char *argv[]) {
                 printf("Enter a valid process ID (pid) after -p.\n");
                 exit(EXIT_FAILURE);
             }
-            // Add pid to Pids linked list.
-            ll_push(pids, pid);
+            
+            ll_push(pids, pid); // add pid to list (extra credit: support multiple `-p` flags)
             break;
         case 's':
             flipOption(optarg, &psFlags.singleChar);
@@ -94,16 +111,18 @@ int main(int argc, char *argv[]) {
             flipOption(optarg, &psFlags.command);
             break;
         case 'm':
-            psFlags.procMem = 1;
-            // For -m we check that the correct number of arguments have been supplied, and attempt to parse.
-            // That is, there should be at least 2 valid arguments after "-m" was parsed (optind-1).
+            psFlags.procMem = true;
+            // For -m we check that the correct number of arguments have been supplied,
+            // and attempt to parse. That is, there should be at least 2 valid arguments
+            // after "-m" was parsed (optind-1).
             if (optind < argc) {
                 mem_addr = strtoul(argv[optind - 1], NULL, 16);
                 mem_len = (int)strtol(argv[optind], NULL, 10);
             }
             // If any error has occured in parsing both optargs, issue an error.
             if (mem_addr == 0 || mem_len < 0) {
-                printf("Specify a valid (positive) amount of memory at a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
+                printf("Specify a valid (positive) amount of memory at a valid (nonzero)");
+                printf("memory address in hex and length in decimal with \'-m\'.\n");
                 exit(EXIT_FAILURE);
             }
             optind += 1;
@@ -120,10 +139,10 @@ int main(int argc, char *argv[]) {
         getCurrentUserProcesses(&pids);
     }
 
+    // `-m` is only supported for one process at a time
     if (pids->size != 1 && psFlags.procMem) {
-        printf(
-            "The -m option is incompatible with multiple processes.\
-        Please specify only one pid when using the -p flag.\n");
+        printf("The -m option is incompatible with multiple processes.");
+        printf("Please specify only one pid when using the -p flag.\n");
     }
 
     // PRINT PROCESS INFO
@@ -135,7 +154,6 @@ int main(int argc, char *argv[]) {
         if (psFlags.systemTime) printf("stime=%lu ", getSystemTime(curr->value));
         if (psFlags.virtMemory) printf("%d ", getVirtMemory(curr->value));
         if (psFlags.command) {
-            // For cmdline, we take the str and then free it once it's been printed.
             char *cmdline_str = getCmdline(curr->value);
             printf("[%s] ", cmdline_str);
             free(cmdline_str);
@@ -149,8 +167,7 @@ int main(int argc, char *argv[]) {
         curr = curr->next;
     }
 
-    // Free pids linked list recursively.
-    ll_free(pids);
+    ll_free(pids); // destruct linked list and free all memory
 
     exit(EXIT_SUCCESS);
 }

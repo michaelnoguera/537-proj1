@@ -1,3 +1,5 @@
+# See README for notes about project organization
+
 DEPS=proc.h linkedlist.h
 CFLAGS=-std=c99 -Wall
 

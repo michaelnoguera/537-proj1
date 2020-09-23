@@ -1,18 +1,34 @@
+/** 
+ * CS 537 Programming Assignment 1 (Fall 2020)
+ * @author Michael Noguera
+ * @date 9/23/2020
+ * 
+ * @file linkedlist.h
+ * @brief Implementation of heap-allocated circular singly-linked list with head 
+ * and tail pointers.
+ * 
+ * Nodes store `int` values. Order is not guaranteed when multiple nodes have the
+ * same value, especially after remove operations.
+ */
+
 #include <stdlib.h>
 
 #ifndef _LINKEDLIST_
 #define _LINKEDLIST_
 
-/** Node type for linkedlist_t, that holds a single integer value. */
+/** Node type for linkedlist_t
+ * 
+ * Holds a single integer value (and `next` pointer to maintain list structure).
+ */
 typedef struct ll_node_t {
     int value; /**< the value stored in the node */ 
     struct ll_node_t* next; /**< pointer to the next node in the list */
 } node;
 
-/**
- * Implementation of heap-allocated circular singly-linked list with head 
- * and tail pointers. Order is not guaranteed when multiple nodes have the
- * same value, especially after remove operations.
+/**  Wrapper, defines linkedlist type.
+ * 
+ * Exposes size for outside usage, though the user can access individual
+ * nodes through head and tail.
  */
 typedef struct linkedlist_t {
     int size; /**< number of items currently in the list*/
@@ -23,6 +39,8 @@ typedef struct linkedlist_t {
 /**
  * Initializes a new empty linkedlist.
  * Remember to call ll_free when done!
+ * 
+ * @return pointer to new heap-allocated linkedlist
  */
 linkedlist* ll_initialize();
 

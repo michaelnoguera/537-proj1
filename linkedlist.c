@@ -1,10 +1,21 @@
+/**
+ * CS 537 Programming Assignment 1 (Fall 2020)
+ * @author Michael Noguera, contributions by Julien de Castelnau
+ * @date 9/23/2020
+ * @file linkedlist.c
+ */
+
 #include "linkedlist.h"
 
 #include <stdio.h>
 #include <assert.h>
 
-// initializes empty list
-// remember to call ll_free when done!
+/**
+ * Initializes a new empty linkedlist.
+ * Remember to call ll_free when done!
+ * 
+ * @return pointer to new heap-allocated linkedlist
+ */
 linkedlist* ll_initialize() {
     linkedlist* list = (linkedlist*)malloc(sizeof(linkedlist));
     if (list == NULL) {
@@ -19,7 +30,12 @@ linkedlist* ll_initialize() {
     return list;
 }
 
-// adds new node with value at end
+/**
+ * Adds a new node to the end of a linkedlist.
+ * 
+ * @param list The list to append to.
+ * @param value The value of the new node.
+ */
 void ll_push(linkedlist* list, int value) {
     if (list == NULL) {
         perror("Can't add an element to NULL.");
@@ -47,8 +63,13 @@ void ll_push(linkedlist* list, int value) {
     new->next = list->head;  // complete circular linking
 }
 
-// gets value of node at index
-// returns -1 if no such node exists
+/**
+ * Gets the value of the node at an index.
+ * 
+ * @param list The list to search.
+ * @param index The index of the node to be retrieved. Lists are zero-indexed.
+ * @return The value of the node, or NULL if no such node exists.
+ */
 int ll_get(const linkedlist* list, int index) {
     if (list == NULL) {
         perror("Can't get an element from NULL.");
@@ -65,8 +86,12 @@ int ll_get(const linkedlist* list, int index) {
     return curr->value;
 }
 
-// free all memory from the specified linkedlist
-// if ptr is null, no operation is performed
+/**
+ * Frees all memory from the specified linkedlist.
+ * If  `ptr` is NULL, no operation is performed.
+ * 
+ * @param ptr Pointer to linkedlist to be freed.
+ */
 void ll_free(linkedlist* ptr) {
     if (ptr == NULL) return;
     
@@ -83,7 +108,12 @@ void ll_free(linkedlist* ptr) {
     free(ptr);
 }
 
-// print out all values in list 
+/**
+ * Prints all values from the specified linkedlist.
+ * @author Julien de Castelnau
+ * 
+ * @param list The list to print.
+ */
 void ll_print(const linkedlist* list) {
     node* curr = list->head;
 

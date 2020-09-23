@@ -1,3 +1,10 @@
+/**
+ * CS 537 Programming Assignment 1 (Fall 2020)
+ * @authors Michael Noguera and Julien de Castelnau
+ * @date 9/23/2020
+ * @file proc.c
+ */
+
 #define _GNU_SOURCE
 
 #include <assert.h>
@@ -313,10 +320,8 @@ char* readMem(int pid, unsigned long offset, int len) {
     char* outstring = NULL;
 
     for (int i = 0; i < len; i++) {
-        int readOutput = -1;
-
-        if ((readOutput = read(mem_fd, &byte, 1)) < 0) {
-            printf("\n");
+        if (read(mem_fd, &byte, 1) < 0) {
+            printf("Error reading memory for pid %d.\n", pid);
             exit(EXIT_FAILURE);
         }
 
@@ -410,8 +415,9 @@ static void skipCommHelper(FILE* buf, int depth, int* len) {
 static void skipComm(FILE* statfile) {
     assert(statfile != NULL && !ferror(statfile) && !feof(statfile));
 
-    int maxlen = 18;
-    skipCommHelper(statfile, 1, &maxlen);
+    const int maxlen = 18; // 16 characters from "comm" + 2 parenthesis
+    int len = maxlen;
+    skipCommHelper(statfile, 1, &len);
 
     assert(fgetc(statfile) == ' ');  // consume trailing space
     return;

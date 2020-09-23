@@ -1,5 +1,12 @@
-// CS 537 Programming Assignment 1 (Fall 2020)
-// Michael Noguera and Julien de Castelnau
+/**
+ * CS 537 Programming Assignment 1 (Fall 2020)
+ * @authors Michael Noguera and Julien de Castelnau
+ * @date 9/23/2020
+ * 
+ * @file proc.h
+ * @brief Provides an interface over the /proc filesystem and exposes functions for getting 
+ * process information.
+ */
 
 #include "linkedlist.h"
 

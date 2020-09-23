@@ -1,3 +1,7 @@
+CS 537 Programming Assignment 1 (Fall 2020)
+Michael Noguera (noguera@cs.wisc.edu) and Julien de Castelnau (de-castelnau@cs.wisc.edu)
+due 9/23/2020 at 5pm
+
 == BUILDING ==
 
 To build 537ps , simply run "make" at the root of this directory. If you specify the DEBUG 
@@ -12,7 +16,8 @@ When run with no flags (i.e "./537ps"), 537ps outputs the list of all processes 
 calling user. The following flags are recognized by 537ps:
 [-p <pid>] [-s] [-U] [-S] [-v] [-c] [-m <addr> <len>]
 Multiple "-p <pid>" instances can be specified to list multiple processes. 
-Note that for "-m", exactly one PID must be specified, otherwise the rest of the processes are guaranteed to be using invalid memory. If none or multiple PIDs are specified, an error will be thrown.
+Note that for "-m", exactly one PID must be specified. If none or multiple PIDs are specified, 
+an error will be thrown.
 
 
 == PROJECT STRUCTURE == 
