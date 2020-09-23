@@ -143,6 +143,7 @@ int main(int argc, char *argv[]) {
     if (pids->size != 1 && psFlags.procMem) {
         printf("The -m option is incompatible with multiple processes.");
         printf("Please specify only one pid when using the -p flag.\n");
+        exit(EXIT_FAILURE);
     }
 
     // PRINT PROCESS INFO
