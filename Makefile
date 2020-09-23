@@ -1,4 +1,4 @@
-DEPS=proc.h util.h linkedlist.h
+DEPS=proc.h linkedlist.h
 CFLAGS=-std=c99 -Wall
 
 .PHONY:clean
@@ -6,7 +6,7 @@ CFLAGS=-std=c99 -Wall
 all: 537ps
 
 537ps: proc.o main.o linkedlist.o
-	gcc -o 537ps proc.o main.o linkedlist.o
+	gcc -o 537ps main.o proc.o linkedlist.o
 
 %.o: %.c $(DEPS)
 ifeq ($(DEBUG),true)

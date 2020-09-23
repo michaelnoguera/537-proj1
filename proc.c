@@ -7,11 +7,14 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <stdbool.h>
 
 // -m includes
 
 #include <sys/ptrace.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #include <fcntl.h>
 
 #include "proc.h"
@@ -176,7 +179,10 @@ char* getCmdline(int pid) {
     while (getdelim(&arg, &bufsize, 0, cmdline_file) != -1) {
         if (cmdline == NULL) {
             // Print the new arg alone to cmdline.
-            asprintf(&cmdline, "%s", arg);
+            if(asprintf(&cmdline, "%s", arg) == -1) {
+                perror("error allocating memory to hold string");
+                exit(EXIT_FAILURE);
+            }
         } else {
             // Use asprintf to extend the current string.
             // Note: we prevent a memory leak by setting a pointer to the same address
@@ -184,7 +190,10 @@ char* getCmdline(int pid) {
             // a new address, the old one doesn't stick around.
 
             char *temp = cmdline;
-            asprintf(&cmdline, "%s %s", cmdline, arg);
+            if (asprintf(&cmdline, "%s %s", cmdline, arg) == -1) {
+                perror("error allocating memory to hold string");
+                exit(EXIT_FAILURE);
+            }
             free(temp);
         }
     }
@@ -194,7 +203,7 @@ char* getCmdline(int pid) {
     return cmdline;
 }
 
-/*static bool isValidMem(int pid, int offset, int len) {
+static bool isValidMem(int pid, unsigned long offset, int len) {
     // construct filepath from pid
     char* filepath;
     if (asprintf(&filepath, "/proc/%d/maps", pid) == -1) {
@@ -202,20 +211,49 @@ char* getCmdline(int pid) {
         exit(EXIT_FAILURE);
     }
 
-    // create statusfile input stream
+    // create mapsfile input stream
     FILE* mapsfile = fopen(filepath, "r");
     if (mapsfile == NULL) {
         printf("Error accessing %s.\n", filepath);
         exit(EXIT_FAILURE);
     }
     free(filepath); //upon success, filepath is no longer needed
+    
+   
+    size_t bufsize = 0;
+    char *line;
+    while(1) {
+        // read line into temp heap-alloc'd buffer
+        // "If *lineptr is set to NULL and *n is set 0 before the call, 
+        // then getline() will allocate a buffer for storing the line.  
+        line = NULL;
+        bufsize = 0;
+        if (getline(&line, &bufsize, mapsfile) < 0) return false;
 
+        unsigned long start_address;
+        unsigned long end_address;
+        
+        if (sscanf(line, "%lx-%lx ", &start_address, &end_address) != 2) {
+            perror("Error reading mem map file.\n");
+            exit(EXIT_FAILURE);
+        }
 
-}*/
+        if (start_address <= offset && offset + ((unsigned long)len) <= end_address) {
+            free(line);
+            return true;
+        }
+        
+        free(line);
 
-/*
-void readMem(int pid, int offset, int len) {
-    char buf;
+    }
+    return false;
+}
+
+char* readMem(int pid, unsigned long offset, int len) {
+    if(!isValidMem(pid, offset, len)) {
+        printf("Invalid memory range specified. Please specify memory in the process's address space.");
+        exit(EXIT_FAILURE);
+    }
 
     // construct filepath from pid
     char* filepath;
@@ -224,9 +262,9 @@ void readMem(int pid, int offset, int len) {
         exit(EXIT_FAILURE);
     }
 
-    // attempt to access cmdline file
+    // attempt to access mem file
     int mem_fd = open(filepath, O_RDONLY);
-    if (mem_fd == NULL) {
+    if (mem_fd == 0) {
         printf("Error accessing %s.\n Are the permissions set correctly for PTRACE_ATTACH? (Try as root)", filepath);
         exit(EXIT_FAILURE);
     }
@@ -237,21 +275,39 @@ void readMem(int pid, int offset, int len) {
     waitpid(pid, NULL, 0); // make sure proc isn't active
     lseek(mem_fd, offset, SEEK_SET);
 
-    //char *outstring;
+    char byte = 0;
+    char *outstring = NULL;
+    
     for (int i=0; i < len; i++) {
         int readOutput = -1;
 
-        if ((readOutput = read(mem_fd, &buf, 1)) < 0) {
+        if ((readOutput = read(mem_fd, &byte, 1)) < 0) {
             printf("\n");
             exit(EXIT_FAILURE);
         }
-        printf("%02x ", buf);
+
+        if (outstring == NULL) {
+            if (asprintf(&outstring, "%02x",  byte) == -1) {
+                perror("Error allocating memory to hold output string.");
+                exit(EXIT_FAILURE);  
+            } 
+        } else {
+            char *temp = outstring;
+            if (asprintf(&outstring, "%s %02x", outstring, byte) == -1) {
+                perror("Error allocating memory to hold output string.");
+                free(temp);
+                exit(EXIT_FAILURE);  
+
+            }
+            free(temp);
+        }
     }
     
     ptrace(PTRACE_DETACH, pid, NULL, NULL);
 
+    return outstring;
 }
-*/
+
 
 // Gets a list of processes belonging to the current user.
 // Adds the user processes' pids to the provided linked list

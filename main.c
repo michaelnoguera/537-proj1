@@ -13,6 +13,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 
 #include "linkedlist.h"
 #include "proc.h"
@@ -48,7 +49,7 @@ static void flipOption(char *optarg, bool *opt) {
 int main(int argc, char *argv[]) {
     // Initialize linked list to hold the list of pids.
     linkedlist* pids = ll_initialize();
-    int mem_addr = 0;
+    unsigned long mem_addr = 0;
     int mem_len = 0;
 
     // Store the program's option flags, 1 = on & 0 = off.
@@ -100,16 +101,15 @@ int main(int argc, char *argv[]) {
                 // For -m we check that the correct number of arguments have been supplied, and attempt to parse.
                 // That is, there should be at least 2 valid arguments after "-m" was parsed (optind-1).
                 if (optind < argc) {
-                    mem_addr = (int)strtol(argv[optind-1], NULL, 16);
+                    mem_addr =  strtoul(argv[optind-1], NULL, 16);
                     mem_len = (int)strtol(argv[optind], NULL, 10);
                 }
                 // If any error has occured in parsing both optargs, issue an error.
-                if (mem_addr == 0 || mem_len == 0) {
-                    printf("Enter a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
+                if (mem_addr == 0 || mem_len < 0) {
+                    printf("Specify a valid (positive) amount of memory at a valid (nonzero) memory address in hex and length in decimal with \'-m\'.\n");
                     exit(EXIT_FAILURE);
                 }
                 optind += 1;
-                printf("addr: %d, len: %d\n", mem_addr, mem_len);
                 break;
             case 1:
             default:
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
 
     if (pids->size != 1 && psFlags.procMem) {
         printf("The -m option is incompatible with multiple processes.\
-        Please specify only one pid using the -p flag.\n");
+        Please specify only one pid when using the -p flag.\n");
     }
 
     // PRINT PROCESS INFO
@@ -139,10 +139,14 @@ int main(int argc, char *argv[]) {
         if (psFlags.command) {
             // For cmdline, we take the str and then free it once it's been printed.
             char *cmdline_str = getCmdline(curr->value);
-            printf("[%s]", cmdline_str);
+            printf("[%s] ", cmdline_str);
             free(cmdline_str);
         }
-        //if (psFlags.procMem) printf("\n"); readMem(curr->value,mem_addr,mem_len);
+        if (psFlags.procMem) {
+            char *memdump = readMem(curr->value,mem_addr,mem_len);
+            printf("[%lx: %s]", mem_addr,memdump);
+            free(memdump);
+        } 
         printf("\n");
         curr = curr->next;
     }
