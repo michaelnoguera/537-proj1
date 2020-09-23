@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
             }
             // If any error has occured in parsing both optargs, issue an error.
             if (mem_addr == 0 || mem_len < 0) {
-                printf("Specify a valid (positive) amount of memory at a valid (nonzero)");
+                printf("Specify a valid (positive) amount of memory at a valid (nonzero) ");
                 printf("memory address in hex and length in decimal with \'-m\'.\n");
                 exit(EXIT_FAILURE);
             }
@@ -141,8 +141,8 @@ int main(int argc, char *argv[]) {
 
     // `-m` is only supported for one process at a time
     if (pids->size != 1 && psFlags.procMem) {
-        printf("The -m option is incompatible with multiple processes.");
-        printf("Please specify only one pid when using the -p flag.\n");
+        printf("The `-m` option is incompatible with multiple processes.\n");
+        printf("Please specify only one pid by using the `-p` flag.\n");
         exit(EXIT_FAILURE);
     }
 
